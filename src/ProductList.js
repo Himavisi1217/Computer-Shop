@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
+import { storage } from './firebase';
+import { ref, deleteObject } from 'firebase/storage';
 import './ProductList.css'; // Import ProductList CSS
 
 const SUPABASE_URL = 'https://pulfalwtedkoxiatwaof.supabase.co';
@@ -30,6 +32,8 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [editProductId, setEditProductId] = useState(null);
+  const [editStock, setEditStock] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -49,6 +53,40 @@ const ProductList = () => {
 
     fetchProducts();
   }, [selectedCategory]);
+
+  const handleDelete = async (id, photoUrl) => {
+    try {
+      // Delete the photo from Firebase Storage
+      const photoRef = ref(storage, photoUrl);
+      await deleteObject(photoRef);
+
+      // Delete the product from Supabase
+      const { error } = await supabase.from('products').delete().eq('product_id', id);
+      if (error) throw error;
+      setProducts(products.filter((product) => product.product_id !== id));
+    } catch (err) {
+      setError('Error deleting product: ' + err.message);
+    }
+  };
+
+  const handleUpdateStock = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ stock: parseInt(editStock) })
+        .eq('product_id', id);
+      if (error) throw error;
+      setProducts(
+        products.map((product) =>
+          product.product_id === id ? { ...product, stock: parseInt(editStock) } : product
+        )
+      );
+      setEditProductId(null);
+      setEditStock('');
+    } catch (err) {
+      setError('Error updating stock: ' + err.message);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="error">{error}</p>;
@@ -84,6 +122,7 @@ const ProductList = () => {
                 <th>Description</th>
                 <th>Stock</th>
                 <th>Photo</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -92,13 +131,47 @@ const ProductList = () => {
                   <td>{product.product_name}</td>
                   <td>LKR {product.price.toFixed(2)}</td>
                   <td>{product.product_description}</td>
-                  <td>{product.stock}</td>
+                  <td>
+                    {editProductId === product.product_id ? (
+                      <input
+                        type="number"
+                        value={editStock}
+                        onChange={(e) => setEditStock(e.target.value)}
+                      />
+                    ) : (
+                      product.stock
+                    )}
+                  </td>
                   <td>
                     <img
                       src={product.photo}
                       alt={product.product_name}
                       style={{ width: '100px', height: 'auto' }}
                     />
+                  </td>
+                  <td>
+                    {editProductId === product.product_id ? (
+                      <>
+                        <button onClick={() => handleUpdateStock(product.product_id)}>
+                          Save
+                        </button>
+                        <button onClick={() => setEditProductId(null)}>Cancel</button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            setEditProductId(product.product_id);
+                            setEditStock(product.stock);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button onClick={() => handleDelete(product.product_id, product.photo)}>
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
