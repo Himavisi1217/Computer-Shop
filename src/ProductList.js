@@ -1,4 +1,3 @@
-// src/ProductList.js
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
@@ -34,10 +33,10 @@ const ProductList = () => {
 
   return (
     <div className="container">
-        <nav>
-          <Link to="/add-product">Add Product</Link>
-          <Link to="/products">View Products</Link>
-        </nav>
+      <nav>
+        <Link to="/add-product">Add Product</Link>
+        <Link to="/products">View Products</Link>
+      </nav>
       <h1>Product List</h1>
       <table>
         <thead>
@@ -46,16 +45,18 @@ const ProductList = () => {
             <th>Price</th>
             <th>Description</th>
             <th>Stock</th>
+            <th>Category</th>
             <th>Photo</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product) => (
-            <tr key={product.id}>
+            <tr key={product.product_id}>
               <td>{product.product_name}</td>
               <td>LKR {product.price.toFixed(2)}</td>
               <td>{product.product_description}</td>
               <td>{product.stock}</td>
+              <td>{product.category}</td>
               <td>
                 <img
                   src={product.photo}

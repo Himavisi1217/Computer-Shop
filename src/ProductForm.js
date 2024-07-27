@@ -1,4 +1,3 @@
-// src/ProductForm.js
 import React, { useState } from 'react';
 import { storage } from './firebase'; // Import Firebase storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -11,11 +10,30 @@ const SUPABASE_URL = 'https://pulfalwtedkoxiatwaof.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1bGZhbHd0ZWRrb3hpYXR3YW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjIwMDQyOTUsImV4cCI6MjAzNzU4MDI5NX0.hZzrMZhDoKyCkNGEM5DJrxZGQtcXTguxl8e_CTnu6Bw';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const categories = [
+  'Laptops',
+  'Desktops',
+  'Monitors',
+  'Keyboards/Mouse',
+  'Printers',
+  'Scanners',
+  'CPU',
+  'GPU',
+  'RAM',
+  'Storage',
+  'Power Supply',
+  'Motherboards',
+  'Coolers',
+  'Casings',
+  'Other',
+];
+
 const ProductForm = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
+  const [category, setCategory] = useState(categories[0]);
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -43,9 +61,10 @@ const ProductForm = () => {
         .insert([
           {
             product_name: name,
-            price: parseFloat(price.replace(/[^0-9.-]+/g,"")),
+            price: parseFloat(price.replace(/[^0-9.-]+/g, '')),
             product_description: description,
             stock: parseInt(stock),
+            category: category,
             photo: photoUrl // Save the photo URL from Firebase
           }
         ]);
@@ -59,6 +78,7 @@ const ProductForm = () => {
       setPrice('');
       setDescription('');
       setStock('');
+      setCategory(categories[0]);
       setPhoto(null);
     } catch (err) {
       setError('Error adding product: ' + err.message);
@@ -109,6 +129,20 @@ const ProductForm = () => {
           onChange={(e) => setStock(e.target.value)}
           required
         />
+
+        <label htmlFor="category">Category:</label>
+        <select
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+        >
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
         <label htmlFor="photo">Photo:</label>
         <input
