@@ -4,6 +4,7 @@ import { storage } from './firebase'; // Import Firebase storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
+import './ProductForm.css'
 
 // Initialize Supabase client
 const SUPABASE_URL = 'https://pulfalwtedkoxiatwaof.supabase.co';
