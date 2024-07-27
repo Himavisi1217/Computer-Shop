@@ -34,6 +34,8 @@ const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [editProductId, setEditProductId] = useState(null);
   const [editStock, setEditStock] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -69,22 +71,35 @@ const ProductList = () => {
     }
   };
 
-  const handleUpdateStock = async (id) => {
+  const handleUpdateProduct = async (id) => {
     try {
       const { error } = await supabase
         .from('products')
-        .update({ stock: parseInt(editStock) })
+        .update({
+          stock: parseInt(editStock),
+          price: parseFloat(editPrice.replace(/[^0-9.-]+/g, "")),
+          product_description: editDescription,
+        })
         .eq('product_id', id);
       if (error) throw error;
       setProducts(
         products.map((product) =>
-          product.product_id === id ? { ...product, stock: parseInt(editStock) } : product
+          product.product_id === id
+            ? {
+                ...product,
+                stock: parseInt(editStock),
+                price: parseFloat(editPrice.replace(/[^0-9.-]+/g, "")),
+                product_description: editDescription,
+              }
+            : product
         )
       );
       setEditProductId(null);
       setEditStock('');
+      setEditPrice('');
+      setEditDescription('');
     } catch (err) {
-      setError('Error updating stock: ' + err.message);
+      setError('Error updating product: ' + err.message);
     }
   };
 
@@ -129,8 +144,27 @@ const ProductList = () => {
               {products.map((product) => (
                 <tr key={product.product_id}>
                   <td>{product.product_name}</td>
-                  <td>LKR {product.price.toFixed(2)}</td>
-                  <td>{product.product_description}</td>
+                  <td>
+                    {editProductId === product.product_id ? (
+                      <input
+                        type="text"
+                        value={editPrice}
+                        onChange={(e) => setEditPrice(e.target.value)}
+                      />
+                    ) : (
+                      `LKR ${product.price.toFixed(2)}`
+                    )}
+                  </td>
+                  <td>
+                    {editProductId === product.product_id ? (
+                      <textarea
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                      />
+                    ) : (
+                      product.product_description
+                    )}
+                  </td>
                   <td>
                     {editProductId === product.product_id ? (
                       <input
@@ -152,10 +186,19 @@ const ProductList = () => {
                   <td>
                     {editProductId === product.product_id ? (
                       <>
-                        <button onClick={() => handleUpdateStock(product.product_id)}>
+                        <button onClick={() => handleUpdateProduct(product.product_id)}>
                           Save
                         </button>
-                        <button onClick={() => setEditProductId(null)}>Cancel</button>
+                        <button
+                          onClick={() => {
+                            setEditProductId(null);
+                            setEditStock('');
+                            setEditPrice('');
+                            setEditDescription('');
+                          }}
+                        >
+                          Cancel
+                        </button>
                       </>
                     ) : (
                       <>
@@ -163,6 +206,8 @@ const ProductList = () => {
                           onClick={() => {
                             setEditProductId(product.product_id);
                             setEditStock(product.stock);
+                            setEditPrice(product.price.toFixed(2));
+                            setEditDescription(product.product_description);
                           }}
                         >
                           Edit
