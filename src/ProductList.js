@@ -34,7 +34,7 @@ const ProductList = () => {
   return (
     <div className="container">
         <nav>
-          <Link to="/">Add Product</Link>
+          <Link to="/add-product">Add Product</Link>
           <Link to="/products">View Products</Link>
         </nav>
       <h1>Product List</h1>
