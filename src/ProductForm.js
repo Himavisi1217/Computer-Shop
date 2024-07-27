@@ -34,6 +34,7 @@ const ProductForm = () => {
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState(categories[0]);
+  const [condition, setCondition] = useState('New');
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -61,10 +62,11 @@ const ProductForm = () => {
         .insert([
           {
             product_name: name,
-            price: parseFloat(price.replace(/[^0-9.-]+/g, '')),
+            price: parseFloat(price.replace(/[^0-9.-]+/g, "")),
             product_description: description,
             stock: parseInt(stock),
             category: category,
+            condition: condition,
             photo: photoUrl // Save the photo URL from Firebase
           }
         ]);
@@ -79,6 +81,7 @@ const ProductForm = () => {
       setDescription('');
       setStock('');
       setCategory(categories[0]);
+      setCondition('New');
       setPhoto(null);
     } catch (err) {
       setError('Error adding product: ' + err.message);
@@ -142,6 +145,17 @@ const ProductForm = () => {
               {cat}
             </option>
           ))}
+        </select>
+
+        <label htmlFor="condition">Condition:</label>
+        <select
+          id="condition"
+          value={condition}
+          onChange={(e) => setCondition(e.target.value)}
+          required
+        >
+          <option value="New">New</option>
+          <option value="Used">Used</option>
         </select>
 
         <label htmlFor="photo">Photo:</label>

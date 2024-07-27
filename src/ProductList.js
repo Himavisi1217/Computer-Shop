@@ -136,6 +136,7 @@ const ProductList = () => {
                 <th>Price</th>
                 <th>Description</th>
                 <th>Stock</th>
+                <th>Condition</th>
                 <th>Photo</th>
                 <th>Actions</th>
               </tr>
@@ -176,6 +177,7 @@ const ProductList = () => {
                       product.stock
                     )}
                   </td>
+                  <td>{product.condition}</td>
                   <td>
                     <img
                       src={product.photo}
