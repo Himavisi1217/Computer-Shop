@@ -4,7 +4,7 @@ import { storage } from './firebase'; // Import Firebase storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { createClient } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
-import './ProductForm.css';
+import './ProductForm.css'; // Import ProductForm CSS
 
 // Initialize Supabase client
 const SUPABASE_URL = 'https://pulfalwtedkoxiatwaof.supabase.co';
@@ -70,7 +70,7 @@ const ProductForm = () => {
   return (
     <div className="container">
       <nav>
-        <Link to="/">Add Product</Link>
+        <Link to="/add-product">Add Product</Link>
         <Link to="/products">View Products</Link>
       </nav>
       <h1>Add New Product</h1>
