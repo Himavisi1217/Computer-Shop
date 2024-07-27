@@ -52,7 +52,7 @@ const ProductList = () => {
           {products.map((product) => (
             <tr key={product.id}>
               <td>{product.product_name}</td>
-              <td>${product.price.toFixed(2)}</td>
+              <td>LKR {product.price.toFixed(2)}</td>
               <td>{product.product_description}</td>
               <td>{product.stock}</td>
               <td>
