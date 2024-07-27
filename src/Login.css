@@ -1,7 +1,6 @@
 /* Login.css */
-.login-container {
+.login-page {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(to right, #0062E6, #33AEFF);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,7 +8,7 @@
   margin: 0;
 }
 
-.login-container {
+.login-page .login-container {
   width: 100%;
   max-width: 400px;
   padding: 40px;
@@ -18,12 +17,12 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.login-box {
+.login-page .login-box {
   display: flex;
   flex-direction: column;
 }
 
-h2 {
+.login-page h2 {
   text-align: center;
   margin-bottom: 30px;
   color: #333;
@@ -31,18 +30,18 @@ h2 {
   font-weight: 500;
 }
 
-.input-group {
+.login-page .input-group {
   margin-bottom: 20px;
 }
 
-label {
+.login-page label {
   display: block;
   margin-bottom: 8px;
   color: #333;
   font-weight: 500;
 }
 
-input {
+.login-page input {
   width: 100%;
   padding: 12px;
   border: 1px solid #ccc;
@@ -51,19 +50,19 @@ input {
   transition: border-color 0.3s;
 }
 
-input:focus {
+.login-page input:focus {
   border-color: #0062E6;
   outline: none;
 }
 
-.error {
+.login-page .error {
   color: #e74c3c;
   font-size: 14px;
   margin-top: 10px;
   text-align: center;
 }
 
-.login-btn {
+.login-page .login-btn {
   width: 100%;
   padding: 12px;
   background-color: #0062E6;
@@ -75,24 +74,24 @@ input:focus {
   transition: background-color 0.3s;
 }
 
-.login-btn:hover {
+.login-page .login-btn:hover {
   background-color: #004bb5;
 }
 
 @media (max-width: 500px) {
-  .login-container {
+  .login-page .login-container {
     padding: 20px;
   }
 
-  h2 {
+  .login-page h2 {
     font-size: 22px;
   }
 
-  input {
+  .login-page input {
     font-size: 14px;
   }
 
-  .login-btn {
+  .login-page .login-btn {
     font-size: 14px;
   }
 }
