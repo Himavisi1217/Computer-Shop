@@ -177,9 +177,9 @@ const ProductList = () => {
                     <td key={field}>{product[field]}</td>
                   ))}
                   <td><img src={product.photo} alt={product.model} className="product-photo" /></td>
-                  <td>
-                    <button onClick={() => handleEdit(product, selectedCategory)}>Edit</button>
-                    <button onClick={() => handleDelete(product, selectedCategory)}>Delete</button>
+                  <td className="action-buttons">
+                    <button className="edit-button" onClick={() => handleEdit(product, selectedCategory)}>Edit</button>
+                    <button className="delete-button" onClick={() => handleDelete(product, selectedCategory)}>Delete</button>
                   </td>
                 </tr>
               ))}
