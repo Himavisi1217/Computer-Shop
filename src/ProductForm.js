@@ -28,60 +28,81 @@ const categories = [
   'Other',
 ];
 
+const categoryFields = {
+  Laptops: ['Brand', 'Model', 'Processor', 'RAM', 'Storage', 'GPU', 'Price', 'Additional Details'],
+  Desktops: ['Brand', 'Model', 'Processor', 'RAM', 'Storage', 'GPU', 'Price', 'Additional Details'],
+  Monitors: ['Brand', 'Model', 'Screen Size', 'Resolution', 'Price'],
+  'Keyboards/Mouse': ['Brand', 'Model', 'Type', 'Price'],
+  Printers: ['Brand', 'Model', 'Type', 'Price'],
+  Scanners: ['Brand', 'Model', 'Type', 'Price'],
+  CPU: ['Brand', 'Model', 'Core Count', 'Price'],
+  GPU: ['Brand', 'Model', 'Memory Size', 'Price'],
+  RAM: ['Brand', 'Type', 'Capacity', 'Price'],
+  Storage: ['Brand', 'Type', 'Capacity', 'Price'],
+  'Power Supply': ['Brand', 'Model', 'Wattage', 'Price'],
+  Motherboards: ['Brand', 'Model', 'Form Factor', 'Price'],
+  Coolers: ['Brand', 'Model', 'Type', 'Price'],
+  Casings: ['Brand', 'Model', 'Form Factor Compatibility', 'Price'],
+  Other: ['Brand', 'Model', 'Description', 'Price'],
+};
+
+
 const ProductForm = () => {
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
-  const [stock, setStock] = useState('');
   const [category, setCategory] = useState(categories[0]);
-  const [condition, setCondition] = useState('New');
+  const [formData, setFormData] = useState({});
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
+  
     if (!photo) {
       setError('Please upload a photo.');
       setLoading(false);
       return;
     }
-
+  
     try {
       // Upload photo to Firebase Storage
       const photoRef = ref(storage, `products/${Date.now()}-${photo.name}`);
       await uploadBytes(photoRef, photo);
       const photoUrl = await getDownloadURL(photoRef);
-
+  
+      // Prepare data for insertion
+      const data = {
+        ...formData,
+        price: parseFloat(formData.price.replace(/[^0-9.-]+/g, "")),
+        photo: photoUrl, // Save the photo URL from Firebase
+      };
+  
+      // Determine table name
+      const tableName = category.toLowerCase().replace('/', '_').replace(' ', '_');
+      console.log('Inserting into table:', tableName);
+      console.log('Data:', data);
+  
       // Insert product data into Supabase
       const { error } = await supabase
-        .from('products')
-        .insert([
-          {
-            product_name: name,
-            price: parseFloat(price.replace(/[^0-9.-]+/g, "")),
-            product_description: description,
-            stock: parseInt(stock),
-            category: category,
-            condition: condition,
-            photo: photoUrl // Save the photo URL from Firebase
-          }
-        ]);
-
+        .from(tableName) // Use category name as table name, with '/' replaced by '_'
+        .insert([data]);
+  
       if (error) {
         throw error;
       }
-
+  
       alert('Product added successfully!');
-      setName('');
-      setPrice('');
-      setDescription('');
-      setStock('');
+      setFormData({});
       setCategory(categories[0]);
-      setCondition('New');
       setPhoto(null);
     } catch (err) {
       setError('Error adding product: ' + err.message);
@@ -89,6 +110,7 @@ const ProductForm = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="container">
@@ -98,41 +120,6 @@ const ProductForm = () => {
       </nav>
       <h1>Add New Product</h1>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Product Name:</label>
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-
-        <label htmlFor="price">Price (LKR):</label>
-        <input
-          type="text"
-          id="price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          required
-        />
-
-        <label htmlFor="description">Description:</label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        ></textarea>
-
-        <label htmlFor="stock">Stock:</label>
-        <input
-          type="number"
-          id="stock"
-          value={stock}
-          onChange={(e) => setStock(e.target.value)}
-          required
-        />
-
         <label htmlFor="category">Category:</label>
         <select
           id="category"
@@ -147,16 +134,29 @@ const ProductForm = () => {
           ))}
         </select>
 
-        <label htmlFor="condition">Condition:</label>
-        <select
-          id="condition"
-          value={condition}
-          onChange={(e) => setCondition(e.target.value)}
-          required
-        >
-          <option value="New">New</option>
-          <option value="Used">Used</option>
-        </select>
+        {categoryFields[category].map((field) => (
+          <div key={field}>
+            <label htmlFor={field.toLowerCase()}>{field}:</label>
+            {field === 'Additional Details' ? (
+              <textarea
+                id={field.toLowerCase().replace(' ', '_')}
+                name={field.toLowerCase().replace(' ', '_')}
+                value={formData[field.toLowerCase().replace(' ', '_')] || ''}
+                onChange={handleInputChange}
+                required
+              ></textarea>
+            ) : (
+              <input
+                type="text"
+                id={field.toLowerCase().replace(' ', '_')}
+                name={field.toLowerCase().replace(' ', '_')}
+                value={formData[field.toLowerCase().replace(' ', '_')] || ''}
+                onChange={handleInputChange}
+                required
+              />
+            )}
+          </div>
+        ))}
 
         <label htmlFor="photo">Photo:</label>
         <input
